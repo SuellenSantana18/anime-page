@@ -1,19 +1,38 @@
 const gulp = require("gulp");
 const sass = require("gulp-sass")(require("sass"));
 
-// Compila SCSS  CSS
+const paths = {
+  html: {
+    src: "./src/**/*.html",
+    dest: "./dist",
+  },
+  styles: {
+    src: "./src/styles/main.scss",
+    watch: "./src/styles/**/*.scss",
+    dest: "./dist/css",
+  },
+};
+
+function html() {
+  return gulp.src(paths.html.src).pipe(gulp.dest(paths.html.dest));
+}
+
 function styles() {
-  return gulp.src("./src/styles/main.scss")
+  return gulp
+    .src(paths.styles.src)
     .pipe(sass({ outputStyle: "compressed" }).on("error", sass.logError))
-    .pipe(gulp.dest("./dist/css"));
+    .pipe(gulp.dest(paths.styles.dest));
 }
 
-// Observa alterações
 function watchFiles() {
-  gulp.watch("./src/styles/*.scss", styles);
+  gulp.watch(paths.html.src, html);
+  gulp.watch(paths.styles.watch, styles);
 }
 
-// Exporta tasks
+const build = gulp.series(gulp.parallel(html, styles));
+
+exports.html = html;
 exports.styles = styles;
 exports.watch = watchFiles;
-exports.default = styles;
+exports.build = build;
+exports.default = build;
